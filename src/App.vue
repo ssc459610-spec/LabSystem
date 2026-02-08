@@ -7,15 +7,16 @@
       >
         <div
           style="
-            height: 60px;
-            line-height: 60px;
+            height: 64px;
+            line-height: 64px;
             text-align: center;
             color: white;
             font-weight: bold;
+            font-size: 18px;
             background-color: #434a50;
           "
         >
-          实验室管理系统
+          🖥️ 实验室管理系统
         </div>
 
         <el-menu
@@ -24,21 +25,36 @@
           active-text-color="#ffd04b"
           :default-active="currentView"
         >
-          <el-menu-item-group title="核心业务">
+          <el-menu-item-group title="资产与库存">
             <el-menu-item index="assets" @click="currentView = 'assets'">
               <el-icon><Monitor /></el-icon>
               <span>资产全生命周期</span>
             </el-menu-item>
+            <el-menu-item index="stock" @click="showMsg('耗材库存管理')">
+              <el-icon><Box /></el-icon>
+              <span>耗材与库存管理</span>
+            </el-menu-item>
+          </el-menu-item-group>
+
+          <el-menu-item-group title="核心业务">
             <el-menu-item index="loans" @click="currentView = 'loans'">
               <el-icon><List /></el-icon>
               <span>借用与归还</span>
             </el-menu-item>
+            <el-menu-item index="faults" @click="showMsg('故障报修管理')">
+              <el-icon><Tools /></el-icon>
+              <span>故障与运维</span>
+            </el-menu-item>
           </el-menu-item-group>
 
-          <el-menu-item-group title="系统维护">
-            <el-menu-item index="stats" disabled>
+          <el-menu-item-group title="决策与监控">
+            <el-menu-item index="stats" @click="showMsg('统计分析驾驶舱')">
               <el-icon><PieChart /></el-icon>
-              <span>数据统计 (开发中)</span>
+              <span>数据统计分析</span>
+            </el-menu-item>
+            <el-menu-item index="remote" @click="showMsg('远程控制中心')">
+              <el-icon><Connection /></el-icon>
+              <span>远程控制中心</span>
             </el-menu-item>
           </el-menu-item-group>
         </el-menu>
@@ -59,6 +75,10 @@
         <el-main>
           <AssetModule v-if="currentView === 'assets'" />
           <LoanModule v-if="currentView === 'loans'" />
+          <el-empty
+            v-if="['assets', 'loans'].indexOf(currentView) === -1"
+            description="该模块正在开发中..."
+          />
         </el-main>
       </el-container>
     </el-container>
@@ -67,15 +87,25 @@
 
 <script setup>
 import { ref } from "vue";
-import { Monitor, List, PieChart } from "@element-plus/icons-vue";
+import {
+  Monitor,
+  List,
+  PieChart,
+  Box,
+  Tools,
+  Connection,
+} from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 
-// 关键点3：这里引入了你刚才新建的那两个文件！
-// 如果你没建这两个文件，这里就会报错，所以一定要确保 src/components 下有这两个文件
 import AssetModule from "./components/AssetModule.vue";
 import LoanModule from "./components/LoanModule.vue";
 
-// 这个变量决定显示哪个页面，默认显示 assets
 const currentView = ref("assets");
+
+const showMsg = (name) => {
+  ElMessage.warning(`【${name}】模块在二期开发计划中`);
+  currentView.value = "other"; // 切换到空白页
+};
 </script>
 
 <style>
