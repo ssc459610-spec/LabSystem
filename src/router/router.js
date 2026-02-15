@@ -1,24 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-// 导入组件 (保留你原来的导入)
-import BorrowRuleConfig from "../views/BorrowRuleConfig.vue";
-import BorrowApplication from "../views/BorrowApplication.vue";
-// import ApprovalManagement from "../views/ApprovalManagement.vue"; // 暂时注释，防报错，确认有文件后再解开
-// import BorrowReturnOperation from "../views/BorrowReturnOperation.vue";
-// import ExtensionOverdueManagement from "../views/ExtensionOverdueManagement.vue";
-import AssetModule from "../views/AssetModule.vue"; // 你的资产组件
-import AssetEntry from "../views/AssetEntry.vue";
-import AssetScrap from "../views/AssetScrap.vue";
+// ================= 1. 修改了这里的导入路径 (加上了文件夹名字) =================
+import BorrowRuleConfig from "../views/borrow/BorrowRuleConfig.vue";
+import BorrowApplication from "../views/borrow/BorrowApplication.vue";
+import AssetModule from "../views/asset/AssetModule.vue"; // 你的资产组件
+import AssetEntry from "../views/asset/AssetEntry.vue";
+import AssetScrap from "../views/asset/AssetScrap.vue";
 
 // 为了防止队友文件还没建好报错，我们先定义一个临时组件
-// 等队友文件到位了，把上面的 import 解开，把下面的 TempComponent 删掉即可
 const TempComponent = AssetModule;
-// const ApprovalManagement = TempComponent; // 如果文件有了，把这行删掉
-// const BorrowReturnOperation = TempComponent;
-// const ExtensionOverdueManagement = TempComponent;
 
 const routes = [
-  // ================= 3.1 资产与设备全生命周期 (对应新侧边栏) =================
+  // ================= 3.1 资产与设备全生命周期 =================
   {
     path: "/asset-info",
     name: "AssetInfo",
@@ -32,7 +25,7 @@ const routes = [
   {
     path: "/asset-entry",
     name: "AssetEntry",
-    component: AssetEntry, // 暂时用资产表顶替
+    component: AssetEntry,
     meta: { title: "入库与台账管理", requiresAuth: true, roles: ["admin"] },
   },
   {
@@ -41,13 +34,13 @@ const routes = [
     component: AssetScrap,
     meta: { title: "报废与处置管理", requiresAuth: true, roles: ["admin"] },
   },
-  // 兼容旧路径 (防止有人访问旧书签)
+  // 兼容旧路径
   {
     path: "/assets",
     redirect: "/asset-info",
   },
 
-  // ================= 3.2 借用与归还管理 (保留原权限) =================
+  // ================= 3.2 借用与归还管理 =================
   {
     path: "/",
     redirect: "/asset-info", // 首页改去资产库
@@ -65,9 +58,11 @@ const routes = [
   {
     path: "/approval-management",
     name: "ApprovalManagement",
-    // 动态引入，防报错
+    // ================= 2. 修改了这里的动态引入路径 =================
     component: () =>
-      import("../views/ApprovalManagement.vue").catch(() => TempComponent),
+      import("../views/approval/ApprovalManagement.vue").catch(
+        () => TempComponent,
+      ),
     meta: {
       title: "审批管理",
       requiresAuth: true,
@@ -77,8 +72,11 @@ const routes = [
   {
     path: "/borrow-return-operation",
     name: "BorrowReturnOperation",
+    // ================= 3. 修改了这里的动态引入路径 =================
     component: () =>
-      import("../views/BorrowReturnOperation.vue").catch(() => TempComponent),
+      import("../views/borrow/BorrowReturnOperation.vue").catch(
+        () => TempComponent,
+      ),
     meta: {
       title: "借出归还操作",
       requiresAuth: true,
@@ -88,8 +86,9 @@ const routes = [
   {
     path: "/extension-overdue-management",
     name: "ExtensionOverdueManagement",
+    // ================= 4. 修改了这里的动态引入路径 =================
     component: () =>
-      import("../views/ExtensionOverdueManagement.vue").catch(
+      import("../views/approval/ExtensionOverdueManagement.vue").catch(
         () => TempComponent,
       ),
     meta: {
@@ -175,39 +174,24 @@ const router = createRouter({
 
 // ================= 路由守卫 (原封不动保留) =================
 router.beforeEach((to, from, next) => {
-  // 设置页面标题
   if (to.meta.title) {
     document.title = `${to.meta.title} - 设备借用管理系统`;
   }
-
-  // 权限验证
-  // 注意：如果你要测试 "admin" 权限，请确保这里 userRole 是 admin
-  // 如果你在 App.vue 里是 admin，这里也要是 admin，否则会被踢到 /unauthorized
   if (to.meta.requiresAuth) {
-    // 模拟登录状态 (实际开发请改为从 store 获取)
     const isLoggedIn = true;
-
     if (!isLoggedIn) {
-      next("/login"); // 这里的 /login 页面还没做，可能会白屏，注意
+      next("/login");
       return;
     }
-
-    // 检查用户角色
     if (to.meta.roles) {
-      // 🔴 关键点：这里模拟当前用户是 admin，这样你可以看到所有页面
-      // 以后记得改成 const userStore = useUserStore(); const userRole = userStore.role;
       const userRole = "admin";
-
       if (!to.meta.roles.includes(userRole)) {
-        // 如果没有 /unauthorized 页面，暂时跳回首页或 alert
         console.warn("无权访问:", to.path);
-        // next("/unauthorized");
-        next(false); // 暂时禁止跳转
+        next(false);
         return;
       }
     }
   }
-
   next();
 });
 
