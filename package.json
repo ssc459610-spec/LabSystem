@@ -1,7 +1,7 @@
 {
-  "name": "labsystem",
-  "private": true,
-  "version": "0.0.0",
+  "name": "equipment-borrow-management",
+  "version": "1.0.0",
+  "description": "设备借用与归还管理系统",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,12 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.2",
-    "element-plus": "^2.13.1",
-    "vue": "^3.5.24"
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.5",
+    "pinia": "^2.1.7",
+    "element-plus": "^2.5.0",
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.6.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.1",
-    "vite": "^7.2.4"
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0"
   }
 }
